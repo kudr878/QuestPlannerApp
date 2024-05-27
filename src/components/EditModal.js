@@ -3,7 +3,14 @@ import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSettings } from '../../redux/settingsSlice';
 import { updateUser, verifyPassword } from '../../redux/authSlice';
-import bcrypt from 'bcryptjs';
+import {
+  validateUsername,
+  validateEmail,
+  validateCurrentPassword,
+  validatePassword,
+  validateConfirmPassword
+} from '../utils/errorMessages';
+
 
 
 const log = (level, message) => {
@@ -25,90 +32,67 @@ const EditModal = ({ visible, onClose, field, navigation }) => {
     }, [field, visible]);
     
 
-    const fieldSettings = {
-        username: {
-          title: 'Изменить имя пользователя',
-          inputs: [{ name: 'username', placeholder: 'Новое имя пользователя' }]
-        },
-        email: {
-          title: 'Изменить электронную почту',
-          inputs: [{ name: 'email', placeholder: 'Новая электронная почта' }]
-        },
-        password: {
-            title: 'Изменить пароль',
-            inputs: [
-              { name: 'oldPassword', placeholder: 'Текущий пароль' },
-              { name: 'newPassword', placeholder: 'Новый пароль'},
-              { name: 'confirmPassword', placeholder: 'Подтвердите новый пароль' }
-            ]
-          }
-        };
-      
-        const handleSave = async () => {
-            if (field === 'password') {
-                const result = await dispatch(verifyPassword({ username: user.username, password: formData.oldPassword }));
-                if (result.error) {
-                    setErrors(prev => ({ ...prev, oldPassword: 'Текущий пароль неверен' }));
-                    return;
-                }
-    
-                if (!formData.newPassword || formData.newPassword.trim() === '') {
-                    setErrors(prev => ({ ...prev, newPassword: 'Введите новый пароль' }));
-                    return;
-                }
-    
-                if (formData.newPassword !== formData.confirmPassword) {
-                    setErrors(prev => ({ ...prev, confirmPassword: 'Пароли не совпадают' }));
-                    return;
-                }
-    
-                const userData = { oldPassword: formData.oldPassword, newPassword: formData.newPassword };
-                try {
-                    const updatedUserData = await dispatch(updateSettings(userData)).unwrap();
-                    dispatch(updateUser(updatedUserData));
-                    alert('Пароль обновлен');
-                    onClose();
-                } catch (error) {
-                    console.error('Ошибка при обновлении данных пользователя:', error);
-                }
-            } else {
-                let isValid = true;
-                const newErrors = {};
-                if (field === 'username' && (!formData.username || formData.username === user.username)) {
-                    newErrors.username = 'Введите новое имя пользователя или отличное от текущего';
-                    isValid = false;
-                }
-    
-                if (field === 'email') {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!formData.email || formData.email === user.email || !emailRegex.test(formData.email)) {
-                        newErrors.email = 'Введите корректный адрес электронной почты или отличный от текущего';
-                        isValid = false;
-                    }
-                }
-    
-                if (!isValid) {
-                    setErrors(newErrors);
-                    return;
-                }
-    
-                try {
-                    const updatedUserData = await dispatch(updateSettings(formData)).unwrap();
-                    dispatch(updateUser(updatedUserData));
-                    alert('Данные обновлены');
-                    onClose();
-                } catch (error) {
-                    console.error('Ошибка при обновлении данных пользователя:', error);
-                }
-            }
-        };
 
-  const handleChange = (name, value) => {
-    setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
-    }
-  };
+    const fieldSettings = {
+      username: {
+        title: 'Изменить имя пользователя',
+        inputs: [{ name: 'username', placeholder: 'Новое имя пользователя', validate: validateUsername }]
+      },
+      email: {
+        title: 'Изменить электронную почту',
+        inputs: [{ name: 'email', placeholder: 'Новая электронная почта', validate: validateEmail }]
+      },
+      password: {
+        title: 'Изменить пароль',
+        inputs: [
+          { name: 'oldPassword', placeholder: 'Старый пароль', secureTextEntry: true, validate: validateCurrentPassword },
+          { name: 'newPassword', placeholder: 'Новый пароль', secureTextEntry: true, validate: validatePassword },
+          { name: 'confirmPassword', placeholder: 'Подтвердите новый пароль', secureTextEntry: true, validate: validateConfirmPassword }
+        ]
+      }
+    };
+  
+      
+    const handleSave = async () => {
+      const newErrors = {};
+      let isValid = true;
+  
+      for (const input of fieldSettings[field].inputs) {
+        let error;
+        if (input.name === 'oldPassword') {
+          error = await input.validate(dispatch, user.username, formData[input.name]);
+        } else if (input.name === 'confirmPassword') {
+          error = input.validate(formData.newPassword, formData[input.name]);
+        } else {
+          error = input.validate(formData[input.name], user[input.name]);
+        }
+        if (error) {
+          newErrors[input.name] = error;
+          isValid = false;
+        }
+      }
+  
+      setErrors(newErrors);
+      if (!isValid) return;
+  
+      try {
+        const updatedUserData = await dispatch(updateSettings(formData)).unwrap();
+        dispatch(updateUser(updatedUserData));
+        alert('Данные обновлены');
+        onClose();
+      } catch (error) {
+        console.error('Ошибка при обновлении данных пользователя:', error);
+      }
+    };
+  
+    const handleChange = (name, value) => {
+      setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
+      if (errors[name]) {
+        setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+      }
+    };
+
+
 
   if (!field) return null;
 
