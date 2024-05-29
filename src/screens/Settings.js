@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import EditModal from '../components/EditModal';
-import { logoutUser } from '../../redux/authSlice';
+import { logoutUser,clearUser } from '../../redux/authSlice';
 
 const SettingsScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -11,9 +11,17 @@ const SettingsScreen = ({ navigation }) => {
     const dispatch = useDispatch();
 
     const handleLogout = () => {
-        dispatch(logoutUser());
-        navigation.replace('Auth');
+      dispatch(logoutUser())
+        .unwrap()
+        .then(() => {
+          dispatch(clearUser());
+          navigation.replace('Auth');
+        })
+        .catch((error) => {
+          alert('Ошибка при выходе из системы: ' + error.message);
+        });
     };
+  
     const openModal = (field) => {
       setCurrentField(field);
       setModalVisible(true);

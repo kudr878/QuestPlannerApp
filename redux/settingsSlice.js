@@ -1,22 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_BASE_URL } from './config';
 
 export const updateSettings = createAsyncThunk(
-    'settings/updateSettings',
-    async (userData, { getState, rejectWithValue }) => {
-      const { user, token } = getState().auth;
-      try {
-        const response = await axios.put(`http://89.111.174.34:3000/users/${user.id}`, userData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        return response.data;
-      } catch (error) {
-        return rejectWithValue(error.response.data);
-      }
+  'settings/updateSettings',
+  async (userData, { getState, rejectWithValue }) => {
+    const { user, token } = getState().auth;
+    try {
+      const response = await axios.put(`${API_BASE_URL}/users/${user.id}`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
     }
-  );
+  }
+);
 
 const settingsSlice = createSlice({
   name: 'settings',
@@ -33,7 +34,7 @@ const settingsSlice = createSlice({
       })
       .addCase(updateSettings.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user;
+        state.user = action.payload.user; 
       })
       .addCase(updateSettings.rejected, (state, action) => {
         state.status = 'failed';
@@ -43,3 +44,4 @@ const settingsSlice = createSlice({
 });
 
 export default settingsSlice.reducer;
+

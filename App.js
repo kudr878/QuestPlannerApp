@@ -11,6 +11,8 @@ import UserProfile from './src/screens/UserProfile';
 import Settings from './src/screens/Settings';
 import { Button } from 'react-native';
 import { restoreUser } from './redux/authSlice';
+import CharacterSelect from './src/components/CharacterSelect';
+import ChangeCharacterScreen from './src/screens/ChangeCharacter';
 
 const Stack = createStackNavigator();
 
@@ -27,8 +29,9 @@ const AppContainer = () => {
         });
       setIsLoading(false);
     };
-
     checkLoginStatus();
+
+    
   }, [dispatch]);
 
   if (isLoading) {
@@ -49,6 +52,8 @@ const AppContainer = () => {
         })} />
         <Stack.Screen name="UserProfile" component={UserProfile} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="CharacterSelect" component={CharacterSelect} />
+        <Stack.Screen name="ChangeCharacterScreen" component={ChangeCharacterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

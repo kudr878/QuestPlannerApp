@@ -1,22 +1,35 @@
-import React, { useState , useEffect } from 'react';
-import { View, Text, StyleSheet, BackHandler } from 'react-native';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserData } from '../../redux/authSlice'; 
+import { characterImages } from '../utils/characterImages';
+import TaskList from '../components/TaskList';
+import { fetchTasks } from '../../redux/tasksSlice';
 
-const Home = () => {
+const Home = ({ navigation }) => {
   const user = useSelector((state) => state.auth.user);
-  
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => true 
-    );
-    return () => backHandler.remove(); 
-  }, []);
+    if (user && user.id) {
+      dispatch(fetchUserData());
+      dispatch(fetchTasks(user.id));
+    } else {
+      navigation.replace('Auth');
+    }
+  }, [user, dispatch, navigation]);
+
+  if (!user) {
+    return null;
+  }
 
   return (
+    <ScrollView>
     <View style={styles.container}>
-      <Text>Добро пожаловать домой, {user ? user.username : 'Гость'}!</Text>
+      <Image source={characterImages[user.character_id]} style={{ width: 200, height: 200 }} />
+      <TaskList />
     </View>
+    </ScrollView>
   );
 };
 
