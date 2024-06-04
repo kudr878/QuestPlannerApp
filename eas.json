@@ -1,0 +1,22 @@
+{
+  "cli": {
+    "version": ">= 0.48.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": false,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {     
+       "env": {
+        "API_BASE_URL": "http://89.111.174.34:3000"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}

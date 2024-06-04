@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, Button } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserData } from '../../redux/authSlice'; 
 import { characterImages } from '../utils/characterImages';
@@ -28,6 +28,7 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       <Image source={characterImages[user.character_id]} style={{ width: 200, height: 200 }} />
       <TaskList />
+      <Button title="Create Task" onPress={() => navigation.navigate('CreateTask')} />
     </View>
     </ScrollView>
   );

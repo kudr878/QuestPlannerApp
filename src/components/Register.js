@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, sendVerificationCode, verifyCode } from '../../redux/authSlice';
-import { characterImages } from '../utils/characterImages';
 import CharacterSelect from './CharacterSelect';
 
 const Register = ({ navigation }) => {

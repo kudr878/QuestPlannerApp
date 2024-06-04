@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSettings } from '../../redux/settingsSlice';
-import { updateUser, verifyPassword } from '../../redux/authSlice';
+import { updateUser } from '../../redux/authSlice';
 import {
   validateUsername,
   validateEmail,
@@ -10,15 +10,6 @@ import {
   validatePassword,
   validateConfirmPassword
 } from '../utils/errorMessages';
-
-
-
-const log = (level, message) => {
-const loggingLevel = "debug";
-  if (loggingLevel.localeCompare(level) <= 0) {
-    console[level](message.trim());
-  }
-};
 
 const EditModal = ({ visible, onClose, field, navigation }) => {
     const [formData, setFormData] = useState({});

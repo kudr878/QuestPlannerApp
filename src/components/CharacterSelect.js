@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { updateCharacter } from '../../redux/settingsSlice';
-import { characterImages } from '../utils/characterImages';  // Проверьте правильность пути к файлу
+import { characterImages } from '../utils/characterImages'; 
 
 const CharacterSelect = ({ onSelect, characterId }) => {
     const [selectedCharacter, setSelectedCharacter] = useState(characterId ? characterImages[characterId] : null);

@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../redux/authSlice';
+import * as FileSystem from 'expo-file-system';
 
+
+const logToFile = async (message) => {
+  const fileUri = `${FileSystem.documentDirectory}log.txt`;
+  const timestamp = new Date().toISOString();
+  await FileSystem.writeAsStringAsync(fileUri, `${timestamp} - ${message}\n`, { encoding: FileSystem.EncodingType.UTF8, append: true });
+};
 
 const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');  
@@ -15,9 +22,13 @@ const Login = ({ navigation }) => {
             dispatch(loginUser({ email, password })) 
           .unwrap()
           .then((result) => {
+            logToFile(`Login successful: ${email}`);
+
             navigation.navigate('Home');
           })
           .catch((err) => {
+            logToFile(`Login error: ${err}`);
+
             Alert.alert('Ошибка', err.error || 'Недействительные данные');
           });
       } else {
