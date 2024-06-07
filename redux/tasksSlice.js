@@ -1,17 +1,29 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { API_BASE_URL } from '@env';
+
 const getAuthHeaders = (state) => ({
   headers: {
     Authorization: `Bearer ${state.auth.token}`,
   }
 });
+
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (userId, { getState }) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/tasks/${userId}`, getAuthHeaders(getState()));
     return response.data;
   } catch (error) {
     console.error('Fetch tasks failed:', error);
+    throw error;
+  }
+});
+
+export const fetchTask = createAsyncThunk('tasks/fetchTask', async (taskId, { getState }) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/tasks/task/${taskId}`, getAuthHeaders(getState()));
+    return response.data;
+  } catch (error) {
+    console.error('Fetch task failed:', error);
     throw error;
   }
 });
@@ -31,24 +43,24 @@ export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId) =>
   return taskId;
 });
 
-export const toggleTaskCompletion = createAsyncThunk('tasks/toggleTaskCompletion', async (taskId) => {
-  const response = await axios.patch(`${API_BASE_URL}/tasks/${taskId}/toggle-completion`);
+export const toggleTaskCompletion = createAsyncThunk('tasks/toggleTaskCompletion', async (taskId, { getState }) => {
+  const response = await axios.patch(`${API_BASE_URL}/tasks/${taskId}/toggle-completion`, {}, getAuthHeaders(getState()));
   return response.data;
 });
 
-export const addSubtask = createAsyncThunk('tasks/addSubtask', async (subtaskData) => {
-  const response = await axios.post(`${API_BASE_URL}/subtasks`, subtaskData);
-  return response.data;
+export const addSubtask = createAsyncThunk('tasks/addSubtask', async ({ taskId, subtaskData }) => {
+  const response = await axios.post(`${API_BASE_URL}/tasks/${taskId}/subtasks`, subtaskData);
+  return { taskId, subtask: response.data };
 });
 
-export const updateSubtask = createAsyncThunk('tasks/updateSubtask', async ({ subtaskId, subtaskData }) => {
-  const response = await axios.put(`${API_BASE_URL}/subtasks/${subtaskId}`, subtaskData);
-  return response.data;
+export const updateSubtask = createAsyncThunk('tasks/updateSubtask', async ({ taskId, subtaskId, subtaskData }) => {
+  const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}/subtasks/${subtaskId}`, subtaskData);
+  return { taskId, subtask: response.data };
 });
 
-export const deleteSubtask = createAsyncThunk('tasks/deleteSubtask', async (subtaskId) => {
-  await axios.delete(`${API_BASE_URL}/subtasks/${subtaskId}`);
-  return subtaskId;
+export const deleteSubtask = createAsyncThunk('tasks/deleteSubtask', async ({ taskId, subtaskId }) => {
+  await axios.delete(`${API_BASE_URL}/tasks/${taskId}/subtasks/${subtaskId}`);
+  return { taskId, subtaskId };
 });
 
 const getPluralForm = (number, forms) => {
@@ -118,7 +130,6 @@ const getTaskRepeatInfo = (task) => {
   }
 };
 
-
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState: {
@@ -132,13 +143,31 @@ const tasksSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.tasks = action.payload.map(task => ({
           ...task,
-          repeatInfo: getTaskRepeatInfo(task)
+          repeatInfo: getTaskRepeatInfo(task),
+          subtasks: task.subtasks || [] // Ensure subtasks are included
         }));
+      })
+      .addCase(fetchTask.fulfilled, (state, action) => {
+        const index = state.tasks.findIndex(task => task.id === action.payload.id);
+        if (index === -1) {
+          state.tasks.push({
+            ...action.payload,
+            repeatInfo: getTaskRepeatInfo(action.payload),
+            subtasks: action.payload.subtasks || [] // Ensure subtasks are included
+          });
+        } else {
+          state.tasks[index] = {
+            ...action.payload,
+            repeatInfo: getTaskRepeatInfo(action.payload),
+            subtasks: action.payload.subtasks || [] // Ensure subtasks are included
+          };
+        }
       })
       .addCase(addTask.fulfilled, (state, action) => {
         state.tasks.push({
           ...action.payload,
-          repeatInfo: getTaskRepeatInfo(action.payload)
+          repeatInfo: getTaskRepeatInfo(action.payload),
+          subtasks: action.payload.subtasks || [] // Ensure subtasks are included
         });
       })
       .addCase(updateTask.fulfilled, (state, action) => {
@@ -146,10 +175,12 @@ const tasksSlice = createSlice({
         if (index !== -1) {
           state.tasks[index] = {
             ...action.payload,
-            repeatInfo: getTaskRepeatInfo(action.payload)
+            repeatInfo: getTaskRepeatInfo(action.payload),
+            subtasks: action.payload.subtasks || [], // Ensure subtasks are included
+            difficulty_name: action.payload.difficulty_name // Ensure difficulty name is included
           };
         }
-      })
+      })      
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter(task => task.id !== action.payload);
       })
@@ -158,29 +189,31 @@ const tasksSlice = createSlice({
         if (index !== -1) {
           state.tasks[index] = {
             ...action.payload,
-            repeatInfo: getTaskRepeatInfo(action.payload)
+            repeatInfo: getTaskRepeatInfo(action.payload),
+            subtasks: action.payload.subtasks || [], // Ensure subtasks are included
+            difficulty_name: action.payload.difficulty_name // Ensure difficulty name is included
           };
         }
       })
       .addCase(addSubtask.fulfilled, (state, action) => {
-        const task = state.tasks.find(task => task.id === action.payload.task_id);
+        const task = state.tasks.find(task => task.id === action.payload.taskId);
         if (task) {
-          task.subtasks.push(action.payload);
+          task.subtasks.push(action.payload.subtask);
         }
       })
       .addCase(updateSubtask.fulfilled, (state, action) => {
-        const task = state.tasks.find(task => task.subtasks.find(sub => sub.id === action.payload.id));
+        const task = state.tasks.find(task => task.id === action.payload.taskId);
         if (task) {
-          const subIndex = task.subtasks.findIndex(sub => sub.id === action.payload.id);
-          if (subIndex !== -1) {
-            task.subtasks[subIndex] = action.payload;
+          const subtaskIndex = task.subtasks.findIndex(sub => sub.id === action.payload.subtask.id);
+          if (subtaskIndex !== -1) {
+            task.subtasks[subtaskIndex] = action.payload.subtask;
           }
         }
       })
       .addCase(deleteSubtask.fulfilled, (state, action) => {
-        const task = state.tasks.find(task => task.subtasks.find(sub => sub.id === action.payload));
+        const task = state.tasks.find(task => task.id === action.payload.taskId);
         if (task) {
-          task.subtasks = task.subtasks.filter(sub => sub.id !== action.payload);
+          task.subtasks = task.subtasks.filter(sub => sub.id !== action.payload.subtaskId);
         }
       });
   }

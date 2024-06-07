@@ -18,51 +18,6 @@ import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '@env';
 
 
-const showAlert = (title, message) => {
-  return new Promise((resolve) => {
-    Alert.alert(
-      title,
-      message,
-      [{ text: 'OK', onPress: () => resolve() }],
-      { cancelable: false }
-    );
-  });
-};
-const checkNetworkAccess = async () => {
-  try {
-    const response = await fetch('https://www.google.com');
-    if (response.status !== 200) throw new Error('Network response was not ok');
-    await showAlert('Сеть доступна', 'Доступ к интернету есть');
-    await logToFile('Доступ к интернету есть');
-  } catch (error) {
-    await showAlert('Ошибка сети', `Нет доступа к сети: ${error.message}`);
-    await logToFile(`Нет доступа к сети: ${error.message}`);
-  }
-};
-
-const checkAPIAccess = async () => {
-  try {
-    const response = await fetch(API_BASE_URL);
-    const responseBody = await response.text();
-    if (response.status !== 200) throw new Error(`API response was not ok: ${response.status} ${response.statusText}`);
-    await showAlert(`Доступ к API есть. Статус: ${response.status}. Тело ответа: ${responseBody}`);
-  } catch (error) {
-    await showAlert(`${error.message}. URL: ${API_BASE_URL}`);
-  }
-};
-
-
-const logToFile = async (message) => {
-  const fileUri = `${FileSystem.documentDirectory}log.txt`;
-  const timestamp = new Date().toISOString();
-  try {
-    await FileSystem.writeAsStringAsync(fileUri, `${timestamp} - ${message}\n`, { encoding: FileSystem.EncodingType.UTF8, append: true });
-    await showAlert('Файл логов', `Сообщение занесено в файл логов. Файл находится по пути: ${fileUri}`);
-  } catch (error) {
-    await showAlert('Ошибка', `Не удалось записать в файл логов: ${error.message}`);
-  }
-};
-
 const Stack = createStackNavigator();
 const AppContainer = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -71,15 +26,12 @@ const AppContainer = () => {
  
   useEffect(() => {
     const checkLoginStatus = async () => {
-      await checkNetworkAccess();
-      await checkAPIAccess();
       await dispatch(restoreUser()).unwrap()
         .then(() => {
           return dispatch(refreshAuthToken()).unwrap();
         })
         .catch(() => {
           console.log('No user found');
-          logToFile('No user found');
         });
       setIsLoading(false);
     };

@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { View, Button, StyleSheet } from 'react-native';
 import Login from '../components/Login';
 import Register from '../components/Register';
+import { authStyles} from '../styles/AuthStyles';
 
 const Auth = ({ navigation }) => {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.switchContainer}>
+    <View style={authStyles.container}>
+      <View style={authStyles.switchContainer}>
         <Button
           title="Логин"
           onPress={() => setIsLogin(true)}
@@ -26,16 +27,5 @@ const Auth = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-});
 
 export default Auth;

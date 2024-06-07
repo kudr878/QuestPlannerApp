@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { deleteTask, deleteSubtask, toggleTaskCompletion } from '../../redux/tasksSlice';
+import { deleteTask, toggleTaskCompletion } from '../../redux/tasksSlice';
 import { useNavigation } from '@react-navigation/native';
 const TaskList = () => {
   const tasks = useSelector(state => state.tasks.tasks);
@@ -10,10 +10,6 @@ const TaskList = () => {
 
   const handleDeleteTask = (taskId) => {
     dispatch(deleteTask(taskId));
-  };
-
-  const handleDeleteSubtask = (subtaskId) => {
-    dispatch(deleteSubtask(subtaskId));
   };
 
   const handleToggleTaskCompletion = (taskId) => {
@@ -52,9 +48,6 @@ const TaskList = () => {
           {task.subtasks && task.subtasks.map(subtask => (
             <View key={subtask.id} style={styles.subtaskContainer}>
               <Text>{subtask.content}</Text>
-              <TouchableOpacity onPress={() => handleDeleteSubtask(subtask.id)}>
-                <Text style={styles.deleteButton}>Delete Subtask</Text>
-              </TouchableOpacity>
             </View>
           ))}
         </View>

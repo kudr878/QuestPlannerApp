@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../redux/authSlice';
 import * as FileSystem from 'expo-file-system';
-
+import { authStyles  as styles} from '../styles/AuthStyles';
 
 const logToFile = async (message) => {
   const fileUri = `${FileSystem.documentDirectory}log.txt`;
@@ -38,13 +38,14 @@ const Login = ({ navigation }) => {
   
     return (
       <View style={styles.container}>
-        <Text>Логин</Text>
         <TextInput
+          style={styles.input}
           placeholder="Имя пользователя"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
+          style={styles.input}
           placeholder="Пароль"
           value={password}
           onChangeText={setPassword}
@@ -55,12 +56,4 @@ const Login = ({ navigation }) => {
     );
   };
   
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  });
-  
-  export default Login;
+export default Login;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { characterImages } from '../utils/characterImages'; 
 
@@ -14,9 +14,9 @@ const CharacterSelect = ({ onSelect, characterId }) => {
     };
 
     return (
-        <View>
-            <Text>Select a character:</Text>
-            <View style={styles.characterGrid}>
+        <View style={styles.container}>
+            <Text style={styles.title}>Выберите персонажа:</Text>
+            <ScrollView horizontal={true} contentContainerStyle={styles.scrollViewContent}>
                 {Object.keys(characterImages).map((id) => (
                     <TouchableOpacity key={id} onPress={() => handleCharacterSelect(id)}>
                         <Image
@@ -28,25 +28,32 @@ const CharacterSelect = ({ onSelect, characterId }) => {
                         />
                     </TouchableOpacity>
                 ))}
-            </View>
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    scrollViewContent: {
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
     image: {
         width: 100,
         height: 100,
-        marginBottom: 10,
+        marginHorizontal: 10,
     },
     selected: {
         borderWidth: 3,
         borderColor: 'blue',
-    },
-    characterGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
     },
 });
 

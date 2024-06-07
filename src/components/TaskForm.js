@@ -20,7 +20,8 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
     difficulty_id: initialTask.difficulty_id || 1,
     deadline_type_id: initialTask.deadline_type_id || 1,
     repeat_interval: initialTask.repeat_interval || 0,
-    deadline_date: initialTask.deadline_date ? new Date(initialTask.deadline_date) : new Date(), 
+    deadline_date: initialTask.deadline_date ? new Date(initialTask.deadline_date) : new Date(),
+    deleteSubtaskIds: [], 
   });
   const [subtask, setSubtask] = useState({ content: '' });
   const [subtasks, setSubtasks] = useState(initialSubtasks);
@@ -29,6 +30,9 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [dateTimePickerMode, setDateTimePickerMode] = useState('date');
 
+  const toggleDayOfWeek = (day) => {
+    setTask((prevTask) => ({ ...prevTask, [day]: !prevTask[day] }));
+  };
 
   const handleAddSubtask = () => {
     if (!subtask.content) {
@@ -38,7 +42,25 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
     setSubtasks([...subtasks, subtask]);
     setSubtask({ content: '' });
   };
-
+  
+  const handleUpdateSubtask = (index, content) => {
+    const updatedSubtasks = subtasks.map((sub, i) => 
+      i === index ? { ...sub, content } : sub
+    );
+    setSubtasks(updatedSubtasks);
+  };
+  const handleDeleteSubtask = (index) => {
+    const subtaskToDelete = subtasks[index];
+    if (subtaskToDelete.id) {
+      setSubtasks(subtasks.filter((_, i) => i !== index));
+      setTask(prevTask => ({
+        ...prevTask,
+        deleteSubtaskIds: [...prevTask.deleteSubtaskIds || [], subtaskToDelete.id]
+      }));
+    } else {
+      setSubtasks(subtasks.filter((_, i) => i !== index));
+    }
+  };
   const validateTask = () => {
     const newErrors = {};
     if (!task.title) newErrors.title = 'Title is required';
@@ -46,12 +68,6 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleTaskSubmit = () => {
-    if (validateTask()) {
-      onSubmit({ ...task, subtasks: subtasks.length > 0 ? subtasks : null });
-    }
   };
 
   const handleDateTimePress = () => {
@@ -70,8 +86,14 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
     }
   };
 
-  const toggleDayOfWeek = (day) => {
-    setTask((prevTask) => ({ ...prevTask, [day]: !prevTask[day] }));
+  const handleTaskSubmit = () => {
+    if (validateTask()) {
+      onSubmit({ 
+        ...task, 
+        subtasks: subtasks.length > 0 ? subtasks : null, 
+        deleteSubtaskIds: task.deleteSubtaskIds 
+      });
+    }
   };
 
   return (
@@ -92,13 +114,12 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
       <Picker
         selectedValue={task.difficulty_id}
         style={styles.input}
-        onValueChange={(itemValue) => setTask((prevTask) => ({ ...prevTask, difficulty_id: itemValue }))}
+        onValueChange={(itemValue) => setTask((prevTask) => ({ ...prevTask, difficulty_id: itemValue }))} 
       >
-        <Picker.Item label="Select Difficulty" value={null} />
-        <Picker.Item label="Easy" value={1} />
-        <Picker.Item label="Normal" value={2} />
-        <Picker.Item label="Hard" value={3} />
-        <Picker.Item label="Very Hard" value={4} />
+        <Picker.Item label="Легкая" value={1} />
+        <Picker.Item label="Обычная" value={2} />
+        <Picker.Item label="Средняя" value={3} />
+        <Picker.Item label="Тяжелая" value={4} />
       </Picker>
       {errors.difficulty_id && <Text style={styles.error}>{errors.difficulty_id}</Text>}
     
@@ -115,12 +136,12 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
           setShowRepeatInterval(itemValue !== 1 && itemValue !== 2);
         }}
       >
-        <Picker.Item label="No Repeat" value={1} />
-        <Picker.Item label="Once" value={2} />
-        <Picker.Item label="Daily" value={3} />
-        <Picker.Item label="Weekly" value={4} />
-        <Picker.Item label="Monthly" value={5} />
-        <Picker.Item label="Yearly" value={6} />
+        <Picker.Item label="Не повторять" value={1} />
+        <Picker.Item label="Один раз" value={2} />
+        <Picker.Item label="Ежедневно" value={3} />
+        <Picker.Item label="Еженедельно" value={4} />
+        <Picker.Item label="Ежемесячно" value={5} />
+        <Picker.Item label="Ежегодно" value={6} />
       </Picker>
     
       {showRepeatInterval && (
@@ -139,7 +160,7 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
           {daysOfWeek.map((day) => (
             <TouchableOpacity
               key={day.value}
-              style={[styles.dayButton, task.days_of_week[day.value] && styles.selectedDayButton]}
+              style={[styles.dayButton, task[day.value] && styles.selectedDayButton]}
               onPress={() => toggleDayOfWeek(day.value)}
             >
               <Text style={styles.dayButtonText}>{day.name}</Text>
@@ -164,26 +185,35 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
               mode={dateTimePickerMode}
               display="default"
               onChange={handleDateTimeChange}
-              />
-            )}
-          </View>
+            />
           )}
-            <Button title="Сохранить задачу" onPress={handleTaskSubmit} />
-        
-        <Text style={styles.subtaskTitle}>Subtasks</Text>
-        {subtasks.map((subtask, index) => (
-          <Text key={index} style={styles.subtaskText}>{subtask.content}</Text>
-        ))}
+        </View>
+      )}
+    
+      <Button title="Сохранить задачу" onPress={handleTaskSubmit} />
+      
+      <Text style={styles.subtaskTitle}>Subtasks</Text>
+    {subtasks.map((subtask, index) => (
+      <View key={index} style={styles.subtaskContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="Subtask Content"
           value={subtask.content}
-          onChangeText={(text) => setSubtask({ content: text })}
+          onChangeText={(text) => handleUpdateSubtask(index, text)}
         />
-        <Button title="Сохранить подзадачу" onPress={handleAddSubtask} />
+        <TouchableOpacity onPress={() => handleDeleteSubtask(index)}>
+          <Text style={styles.deleteButton}>Delete Subtask</Text>
+        </TouchableOpacity>
       </View>
-    );
-  };
+    ))}
+    <TextInput
+      style={styles.input}
+      placeholder="Subtask Content"
+      value={subtask.content}
+      onChangeText={(text) => setSubtask({ content: text })}
+    />
+    <Button title="Add Subtask" onPress={handleAddSubtask} />
+  </View>
+);
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -252,7 +282,7 @@ const styles = StyleSheet.create({
   subtaskTitle: {
     marginTop: 16,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   subtaskText: {
     marginVertical: 4,

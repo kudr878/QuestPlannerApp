@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, sendVerificationCode, verifyCode } from '../../redux/authSlice';
 import CharacterSelect from './CharacterSelect';
+import { authStyles as styles } from '../styles/AuthStyles';
 
 const Register = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -14,8 +15,7 @@ const Register = ({ navigation }) => {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
 
   const dispatch = useDispatch();
-  const { error } = useSelector((state) => state.auth);
-  
+    
   const handleSelectCharacter = (character) => {
     setSelectedCharacter(character.id);
   };
@@ -60,39 +60,44 @@ const Register = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Регистрация</Text>
-      <TextInput placeholder="Имя пользователя" value={username} onChangeText={setUsername} />
-      <TextInput placeholder="Электронная почта" value={email} onChangeText={setEmail} />
-      <TextInput placeholder="Пароль" value={password} onChangeText={setPassword} secureTextEntry />
-      <TextInput placeholder="Подтвердите пароль" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="Имя пользователя"
+        value={username}
+        onChangeText={setUsername}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Электронная почта"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Пароль"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Подтвердите пароль"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
       {isCodeSent && (
-        <TextInput placeholder="Код подтверждения" value={verificationCode} onChangeText={setVerificationCode} />
+        <TextInput
+          style={styles.input}
+          placeholder="Код подтверждения"
+          value={verificationCode}
+          onChangeText={setVerificationCode}
+        />
       )}
-      <View style={styles.characterContainer}>
-      <CharacterSelect onSelect={(character) => handleSelectCharacter(character)} />
-      </View>
+      <CharacterSelect onSelect={(character) => handleSelectCharacter(character)} characterId={selectedCharacter} />
       <Button title={isCodeSent ? "Подтвердить код" : "Зарегистрироваться"} onPress={isCodeSent ? handleVerifyCode : handleRegister} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  characterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
-  },
-  characterImage: {
-    width: 50,
-    height: 50,
-    opacity: 0.5, // базовая прозрачность для невыбранных персонажей
-  },
-});
 
 export default Register;

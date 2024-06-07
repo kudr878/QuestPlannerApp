@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { fetchTasks, updateTask } from '../../redux/tasksSlice';
 import TaskForm from '../components/TaskForm';
-import { fetchTask, updateTask } from '../../redux/tasksSlice';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, ActivityIndicator } from 'react-native';
 
-const EditTask = ({ route, navigation }) => {
-  const { taskId } = route.params;
+const EditTask = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const route = useRoute();
+  const taskId = route.params.taskId;
+
   const task = useSelector(state => state.tasks.tasks.find(t => t.id === taskId));
-  const [isLoading, setIsLoading] = useState(true);
+  const [initialData, setInitialData] = useState(null);
+  const [initialSubtasks, setInitialSubtasks] = useState([]);
 
   useEffect(() => {
     if (!task) {
-      dispatch(fetchTask(taskId)).then(() => setIsLoading(false));
+      dispatch(fetchTasks(taskId));
     } else {
-      setIsLoading(false);
+      setInitialData(task);
+      setInitialSubtasks(task.subtasks || []);
     }
-  }, [taskId, dispatch, task]);
+  }, [taskId, task, dispatch]);
 
-  const handleSave = (taskData) => {
-    dispatch(updateTask({ taskId, taskData })).then(() => {
-      navigation.goBack();
+  const handleSubmit = (taskData) => {
+    dispatch(updateTask({ taskId: task.id, taskData })).then(() => {
+      dispatch(fetchTasks(task.owner_id)); // Обновить список задач после редактирования
+      navigation.navigate('Home'); // Перейти к списку задач
     });
   };
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (!task) {
-    return <View><Text>Task not found!</Text></View>;
+  if (!initialData) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
-    <TaskForm onSubmit={handleSave} initialTask={task} initialSubtasks={task.subtasks || []} />
+    <TaskForm onSubmit={handleSubmit} initialTask={initialData} initialSubtasks={initialSubtasks} />
   );
 };
 
