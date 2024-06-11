@@ -144,7 +144,7 @@ const tasksSlice = createSlice({
         state.tasks = action.payload.map(task => ({
           ...task,
           repeatInfo: getTaskRepeatInfo(task),
-          subtasks: task.subtasks || [] // Ensure subtasks are included
+          subtasks: task.subtasks || [] 
         }));
       })
       .addCase(fetchTask.fulfilled, (state, action) => {
@@ -153,21 +153,21 @@ const tasksSlice = createSlice({
           state.tasks.push({
             ...action.payload,
             repeatInfo: getTaskRepeatInfo(action.payload),
-            subtasks: action.payload.subtasks || [] // Ensure subtasks are included
+            subtasks: action.payload.subtasks || [] 
           });
         } else {
           state.tasks[index] = {
             ...action.payload,
             repeatInfo: getTaskRepeatInfo(action.payload),
-            subtasks: action.payload.subtasks || [] // Ensure subtasks are included
+            subtasks: action.payload.subtasks || [] 
           };
         }
       })
       .addCase(addTask.fulfilled, (state, action) => {
-        state.tasks.push({
-          ...action.payload,
+        state.tasks.unshift({
+          ...action.payload,  // Insert at the beginning of the array
           repeatInfo: getTaskRepeatInfo(action.payload),
-          subtasks: action.payload.subtasks || [] // Ensure subtasks are included
+          subtasks: action.payload.subtasks || [] 
         });
       })
       .addCase(updateTask.fulfilled, (state, action) => {
@@ -176,8 +176,8 @@ const tasksSlice = createSlice({
           state.tasks[index] = {
             ...action.payload,
             repeatInfo: getTaskRepeatInfo(action.payload),
-            subtasks: action.payload.subtasks || [], // Ensure subtasks are included
-            difficulty_name: action.payload.difficulty_name // Ensure difficulty name is included
+            subtasks: action.payload.subtasks || [], 
+            difficulty_name: action.payload.difficulty_name 
           };
         }
       })      
@@ -190,8 +190,8 @@ const tasksSlice = createSlice({
           state.tasks[index] = {
             ...action.payload,
             repeatInfo: getTaskRepeatInfo(action.payload),
-            subtasks: action.payload.subtasks || [], // Ensure subtasks are included
-            difficulty_name: action.payload.difficulty_name // Ensure difficulty name is included
+            subtasks: action.payload.subtasks || [], 
+            difficulty_name: action.payload.difficulty_name 
           };
         }
       })

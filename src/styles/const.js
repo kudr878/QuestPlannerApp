@@ -1,13 +1,13 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-export const ScreenWidth = Dimensions.get('window').width;
-export const ScreenHeight = Dimensions.get('window').height;
+export const screenWidth = Dimensions.get('window').width;
+export const screenHeight = Dimensions.get('window').height;
 
 export const FontSizes = {
-    small: ScreenWidth < 375 ? 12 : 14,
-    medium: ScreenWidth < 375 ? 16 : 18,
-    large: ScreenWidth < 375 ? 20 : 22,
-    xlarge: ScreenWidth < 375 ? 24 : 26,
+    small: Dimensions.get('window').width*0.03,
+    medium: Dimensions.get('window').width*0.038,
+    large: Dimensions.get('window').width*0.05,
+    xlarge: Dimensions.get('window').width*0.06,
 }
 
 export const buttonHeight = Dimensions.get('window').height*0.065;
@@ -19,12 +19,7 @@ export const colorsLightTheme = {
    buttonText : '#fff',
    button : '#76c7c0',
    labelText : '#000',
-}
-
-export const colorsDarkTheme = {
-    buttonText : '#000',
-    button : '#76c7c0',
-    labelText : '#fff',
+   inputBorder : '#76c7c0',
 }
 
 export const constStyles = StyleSheet.create({
@@ -39,23 +34,43 @@ export const constStyles = StyleSheet.create({
         alignItems: 'center'
     },
     button: {
-        bortderTopRightRadius: minBorder,
-        bortderBottomRightRadius: maxBorder,
+        borderTopRightRadius: minBorder,
+        borderBottomRightRadius: maxBorder,
         borderTopLeftRadius: maxBorder,
         borderBottomLeftRadius: minBorder,
-        paddingHorizontal: '10%',
+        paddingHorizontal: '5%',
         marginBottom: '5%', 
         height: buttonHeight,
         justifyContent: 'center',
-        alignItems: 'center',    
+        alignItems: 'center',   
+        backgroundColor: colorsLightTheme.button,
     },
     buttonText : {
         fontSize: FontSizes.medium,
-        color: colorsLightTheme.buttonText,    
+        color: colorsLightTheme.buttonText,
+        textAlign: 'center',
     },
     input : {
-        marginBottom: '5%',
-        height: buttonHeight,
+        borderTopRightRadius: minBorder,
+        borderBottomRightRadius: maxBorder,
+        borderTopLeftRadius: maxBorder,
+        borderBottomLeftRadius: minBorder,
+        paddingHorizontal: '5%',
+        marginBottom: '5%', 
+        minHeight: buttonHeight, 
+        justifyContent: 'center',
+        alignItems: 'center',    
+        backgroundColor: '#ffffff90',
+        borderWidth: .5,
+        borderColor: colorsLightTheme.inputBorder,
         fontSize: FontSizes.medium,
-    }
+    },
+    background: {
+        position: 'absolute',
+        top: 0,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        alignSelf: 'center',
+    },
+
 });

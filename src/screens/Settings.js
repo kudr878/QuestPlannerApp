@@ -15,7 +15,7 @@ const SettingsScreen = ({ navigation }) => {
         .unwrap()
         .then(() => {
           dispatch(clearUser());
-          navigation.replace('Auth');
+          navigation.replace('Settings');
         })
         .catch((error) => {
           alert('Ошибка при выходе из системы: ' + error.message);

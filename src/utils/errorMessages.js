@@ -2,16 +2,17 @@ import { verifyPassword } from "../../redux/authSlice";
 
 export const validateUsername = (username, currentUser) => {
   if (!username) {
-    return 'Введите новое имя пользователя';
+    return 'EMPTY_FIELD'; // Специальный код для пустого поля
   } else if (username === currentUser) {
     return 'Новое имя пользователя должно отличаться от текущего';
   }
+  return null;
 };
 
 export const validateEmail = (email, currentUserEmail) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email) {
-    return 'Введите адрес электронной почты';
+    return 'EMPTY_FIELD'; // Специальный код для пустого поля
   } else if (email === currentUserEmail) {
     return 'Новый адрес электронной почты должен отличаться от текущего';
   } else if (!emailRegex.test(email)) {
@@ -21,23 +22,30 @@ export const validateEmail = (email, currentUserEmail) => {
 };
 
 export const validateCurrentPassword = async (dispatch, username, password) => {
+  if (!password) {
+    return 'EMPTY_FIELD'; // Специальный код для пустого поля
+  }
   const value = await dispatch(verifyPassword({ username, password }));
   if (value.error) {
     return 'Введите ваш текущий пароль';
-  } 
+  }
   return null;
 };
 
-export const validatePassword = (password) => {
+export const validatePassword = (password, oldPassword) => {
   if (!password || password.trim() === '') {
-    return 'Введите новый пароль';
+    return 'EMPTY_FIELD'; // Специальный код для пустого поля
+  } else if (password === oldPassword) {
+    return 'Новый пароль не должен совпадать со старым';
   }
   return null;
 };
 
 export const validateConfirmPassword = (password, confirmPassword) => {
-  if (password !== confirmPassword || !confirmPassword) {
+  if (!confirmPassword) {
+    return 'EMPTY_FIELD'; // Специальный код для пустого поля
+  } else if (password !== confirmPassword) {
     return 'Пароли не совпадают';
-  } 
+  }
   return null;
 };

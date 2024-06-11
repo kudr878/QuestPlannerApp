@@ -7,3 +7,7 @@ export const characterImages = {
     6: require('../../assets/characters/char6.png'), 
     7: require('../../assets/characters/char7.png'), 
 };
+
+export const Images  = {
+    plusButton: require('../../assets/icons/plusButton.png'),
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, Dimensions, Image } from 'react-native';
 import CharacterSelect from '../components/CharacterSelect'; 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateSettings } from '../../redux/settingsSlice'; 
@@ -21,6 +21,17 @@ const ChangeCharacterScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <Image 
+          source={require('../../assets/backgrounds/background.png')}
+          style={{
+              position: 'absolute',
+              top: 0,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+              alignSelf: 'center',
+          }}
+          resizeMode='stretch'
+      />
             <Text style={styles.title}>Выберите нового персонажа</Text>
             <CharacterSelect onSelect={(character) => setSelectedCharacter(character.id)} characterId={selectedCharacter} />
             <Button title="Подтвердить выбор" onPress={handleConfirm} />

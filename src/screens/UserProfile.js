@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
-import { characterImages } from '../utils/characterImages'; 
+import { characterImages } from '../utils/characterImages';
 import { useDispatch } from 'react-redux';
 import { fetchUserData } from '../../redux/authSlice';
 
@@ -12,7 +12,7 @@ const UserProfile = ({ navigation }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      dispatch(fetchUserData()); 
+      dispatch(fetchUserData());
     });
 
     return unsubscribe;
@@ -26,25 +26,27 @@ const UserProfile = ({ navigation }) => {
       threshold += increment * increment_factor;
       increment_factor += 0.2;
     }
-
     return threshold;
   };
+
   useEffect(() => {
-    setCurrentLevelExperience(user.experience - calculateExperienceThreshold(user.level - 1));
+    if (user) {
+      const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
+      setCurrentLevelExperience(user.experience - previousLevelThreshold);
+    }
   }, [user]);
 
-  if (!user) {
-    return <Text>Пользователь не найден</Text>;
-  }
-
   const experienceThreshold = calculateExperienceThreshold(user.level);
-  const progress = (currentLevelExperience / (calculateExperienceThreshold(user.level) - calculateExperienceThreshold(user.level - 1))) * 100;
+  const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
+  const progress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Профиль пользователя</Text>
       <Text>Имя: {user.username}</Text>
       <Text>Почта: {user.email}</Text>
+      <Text>Дата регистрации: {new Date(user.first_login_date).toLocaleDateString()}</Text>
+      <Text>Последний вход: {new Date(user.last_login_date).toLocaleDateString()}</Text>
+      <Text>Всего входов: {user.login_count > 0 ? user.login_count : 1}</Text>
       <Image source={characterImages[user.character_id]} style={{ width: 200, height: 200 }} />
       <Button title="Изменить персонажа" onPress={() => navigation.navigate('ChangeCharacterScreen')} />
 

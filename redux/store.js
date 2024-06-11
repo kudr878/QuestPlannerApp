@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
-import settingsSlice from './settingsSlice';
+import settingsReducer from './settingsSlice';
 import tasksReducer from './tasksSlice';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    settings: settingsSlice,
-    tasks: tasksReducer  
+    settings: settingsReducer,
+    tasks: tasksReducer,
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({

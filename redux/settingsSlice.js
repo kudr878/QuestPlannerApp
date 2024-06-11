@@ -14,7 +14,7 @@ export const updateSettings = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response ? error.response.data : error.message);
     }
   }
 );
