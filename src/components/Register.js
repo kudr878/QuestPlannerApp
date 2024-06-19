@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, Dimensions, TouchableOpacity, BackHandler } from 'react-native';
+import { View, Text, TextInput, Animated, Dimensions, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { registerUser, sendVerificationCode, verifyCode, checkEmail } from '../../redux/authSlice';
 import CharacterSelect from './CharacterSelect';
 import { authStyles as styles } from '../styles/AuthStyles';
+import PrivacyPolicyText from './PrivacyPolicyText';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -18,10 +19,12 @@ const Register = ({ navigation }) => {
   const [isInitialForm, setIsInitialForm] = useState(true);
   const [timer, setTimer] = useState(0);
   const [errors, setErrors] = useState({});
+  const [isPrivacyPolicyVisible, setIsPrivacyPolicyVisible] = useState(false);
   const animation = useRef(new Animated.Value(0)).current;
+  const [privacyPolicyText, setPrivacyPolicyText] = useState('');
 
   const dispatch = useDispatch();
-
+  
   useEffect(() => {
     let interval;
     if (timer > 0) {
@@ -31,13 +34,6 @@ const Register = ({ navigation }) => {
     }
     return () => clearInterval(interval);
   }, [timer]);
-
-  useEffect(() => {
-    const backAction = () => true; // This disables the back button
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  }, []);
 
   const handleSelectCharacter = (character) => {
     setSelectedCharacter(character.id);
@@ -222,6 +218,10 @@ const Register = ({ navigation }) => {
             />
             {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
             {errors.general && <Text style={styles.errorText}>{errors.general}</Text>}
+            <Text style={styles.textPolicy}>
+              При регистрации вы соглашаетесь с <Text style={styles.link} onPress={() => setIsPrivacyPolicyVisible(true)}>политикой конфиденциальности</Text>.
+            </Text>
+
             <TouchableOpacity onPress={handleContinue} style={styles.button}>
               <Text style={styles.buttonText}>Продолжить</Text>
             </TouchableOpacity>
@@ -241,6 +241,26 @@ const Register = ({ navigation }) => {
           </>
         </View>
       </Animated.View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isPrivacyPolicyVisible}
+        onRequestClose={() => setIsPrivacyPolicyVisible(false)}
+      >
+        <View style={styles.overlay}>
+        <View style={styles.modalView}>
+          <ScrollView>
+          <PrivacyPolicyText />
+          </ScrollView>
+          <TouchableOpacity
+              style={styles.buttonClose}
+              onPress={() => setIsPrivacyPolicyVisible(false)}
+            >
+              <Text style={styles.buttonText}>Закрыть</Text>
+            </TouchableOpacity>
+        </View>
+        </View>
+      </Modal>
     </View>
   );
 };

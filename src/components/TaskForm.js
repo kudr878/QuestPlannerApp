@@ -139,12 +139,23 @@ const TaskForm = ({ onSubmit, initialTask = {}, initialSubtasks = [], ownerId })
   return (
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <TextInput
-            style={[styles.input, errors.title && styles.errorBorder]}
-            placeholder="Название задачи"
-            value={task.title}
-            onChangeText={(text) => setTask((prevTask) => ({ ...prevTask, title: text }))}
-          />
+        <TextInput
+  style={[styles.input, errors.title && styles.errorBorder]}
+  placeholder="Название задачи"
+  value={task.title}
+  onChangeText={(text) => {
+    if (text.length <= 255) {
+      setTask(prevTask => ({
+        ...prevTask,
+        title: text
+      }));
+    }
+  }}
+/>
+
+
+
+
           <TextInput
             style={styles.multilineInput}
             placeholder="Описание задачи"

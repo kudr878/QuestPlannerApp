@@ -96,5 +96,39 @@ export const authStyles = StyleSheet.create({
     },
     errorBorder: {
         borderColor: 'red',
-    }
+    },
+    textPolicy  : {
+        fontSize: FontSizes.small,
+        color: 'gray',
+        paddingBottom: '5%',
+    },
+    link: {
+        textDecorationLine: 'underline'
+      },
+      overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+      },
+      modalView: {
+        backgroundColor: '#fff',
+        flex: 1,
+        marginHorizontal: '10%',
+        marginVertical: '20%',
+        padding: '5%',
+        borderTopRightRadius: minBorder,
+        borderBottomRightRadius: maxBorder,
+        borderTopLeftRadius: maxBorder,
+        borderBottomLeftRadius: minBorder,
+      },
+      buttonClose: {
+        ...constStyles.button,
+        marginTop: '5%',
+        marginBottom: '-2.5%',
+        width: '40%',
+        alignSelf: 'center',
+      },
+      modalText: {
+        fontSize: FontSizes.medium,
+        marginBottom: '5%',
+      },
 });

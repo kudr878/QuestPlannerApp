@@ -18,6 +18,7 @@ const Home = ({ navigation, route }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const animation = useRef(new Animated.Value(initialTab === 'Активности' ? 0 : -screenWidth)).current;
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [progress, setProgress] = useState(0);
 
   const scrollViewRef1 = useRef(null);
   const scrollViewRef2 = useRef(null);
@@ -36,6 +37,13 @@ const Home = ({ navigation, route }) => {
       handleTabChange(route.params.initialTab);
     }
   }, [route.params]);
+  useEffect(() => {
+    const experienceThreshold = calculateExperienceThreshold(user.level);
+    const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
+    const progress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
+  
+    setProgress(progress);
+  }, [user.experience, user.level]);
 
   const handleTabChange = (newTab) => {
     resetScrollPosition(newTab);
@@ -82,7 +90,6 @@ const Home = ({ navigation, route }) => {
 
   const experienceThreshold = calculateExperienceThreshold(user.level);
   const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
-  const progress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
 
   return (
     <View style={styles.container}>
@@ -107,10 +114,7 @@ const Home = ({ navigation, route }) => {
             <Text style={styles.levelExperienceText}>Уровень: {user.level}</Text>
             <Text style={styles.levelExperienceText}>{user.experience}/{experienceThreshold}</Text>
             <View style={styles.progressBarContainer}>
-              <View style={[
-                styles.progressBar, 
-                { width: `${progress}%` }
-              ]} />
+            <View style={[styles.progressBar, { width: `${progress}%` }]} />
             </View>
           </Animated.View>
         </React.Fragment>

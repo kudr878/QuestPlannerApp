@@ -10,16 +10,28 @@ const TaskList = ({ activeTab }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [deleteConfirm, setDeleteConfirm] = useState({});
+  const [timers, setTimers] = useState({});
 
   const handleDeleteTask = (taskId) => {
     if (deleteConfirm[taskId]) {
       dispatch(deleteTask(taskId));
+      clearTimeout(timers[taskId]);
+      const newTimers = { ...timers };
+      delete newTimers[taskId];
+      setTimers(newTimers);
       setDeleteConfirm(prevState => ({ ...prevState, [taskId]: false }));
     } else {
       setDeleteConfirm(prevState => ({ ...prevState, [taskId]: true }));
+      const timer = setTimeout(() => {
+        setDeleteConfirm(prevState => ({ ...prevState, [taskId]: false }));
+        const newTimers = { ...timers };
+        delete newTimers[taskId];
+        setTimers(newTimers);
+      }, 3000);
+      setTimers(prev => ({ ...prev, [taskId]: timer }));
     }
   };
-
+  
   const handleToggleTaskCompletion = (taskId) => {
     dispatch(toggleTaskCompletion(taskId));
   };
