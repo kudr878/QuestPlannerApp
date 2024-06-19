@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
-import { useDispatch } from 'react-redux';
 import { characterImages } from '../utils/characterImages';
 
 const CharacterSelect = ({ onSelect, characterId }) => {
     const characterIds = Object.keys(characterImages);
     const initialIndex = characterId ? characterIds.indexOf(characterId) : 0;
     const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-    const dispatch = useDispatch();
+
+    useEffect(() => {
+        handleCharacterSelect(initialIndex);
+    }, [initialIndex]);
 
     const handleCharacterSelect = (index) => {
         const id = characterIds[index];
@@ -59,11 +61,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignItems: 'center',
     },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
     navigation: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -83,7 +80,7 @@ const styles = StyleSheet.create({
     },
     selected: {
         borderWidth: 3,
-        borderColor: 'blue',
+        borderColor: '#22796d',
     },
 });
 

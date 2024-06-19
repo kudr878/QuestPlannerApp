@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Image } from 'react-native';
-import { useSelector } from 'react-redux';
+import { View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { characterImages } from '../utils/characterImages';
-import { useDispatch } from 'react-redux';
 import { fetchUserData } from '../../redux/authSlice';
+import { profileStyles as styles } from '../styles/UserProfileStyles';
+export const calculateExperienceThreshold = (level) => {
+  let threshold = 100;
+  let increment_factor = 1.0;
+  let increment = 150;
+  for (let i = 1; i < level; i++) {
+    threshold += increment * increment_factor;
+    increment_factor += 0.2;
+  }
+  return threshold;
+};
 
 const UserProfile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -14,20 +24,8 @@ const UserProfile = ({ navigation }) => {
     const unsubscribe = navigation.addListener('focus', () => {
       dispatch(fetchUserData());
     });
-
     return unsubscribe;
   }, [navigation, dispatch]);
-
-  const calculateExperienceThreshold = (level) => {
-    let threshold = 100;
-    let increment_factor = 1.0;
-    let increment = 150;
-    for (let i = 1; i < level; i++) {
-      threshold += increment * increment_factor;
-      increment_factor += 0.2;
-    }
-    return threshold;
-  };
 
   useEffect(() => {
     if (user) {
@@ -36,53 +34,39 @@ const UserProfile = ({ navigation }) => {
     }
   }, [user]);
 
+ 
   const experienceThreshold = calculateExperienceThreshold(user.level);
   const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
   const progress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
 
   return (
     <View style={styles.container}>
-      <Text>Имя: {user.username}</Text>
-      <Text>Почта: {user.email}</Text>
-      <Text>Дата регистрации: {new Date(user.first_login_date).toLocaleDateString()}</Text>
-      <Text>Последний вход: {new Date(user.last_login_date).toLocaleDateString()}</Text>
-      <Text>Всего входов: {user.login_count > 0 ? user.login_count : 1}</Text>
-      <Image source={characterImages[user.character_id]} style={{ width: 200, height: 200 }} />
-      <Button title="Изменить персонажа" onPress={() => navigation.navigate('ChangeCharacterScreen')} />
-
-      <Text>Уровень: {user.level}</Text>
-      <Text>{user.experience}/{experienceThreshold}</Text>
+      <Image 
+        source={require('../../assets/backgrounds/background.png')}
+        style={{
+            position: 'absolute',
+            top: 0,
+            width: Dimensions.get('window').width,
+            height: Dimensions.get('window').height,
+            alignSelf: 'center',
+        }}
+        resizeMode='stretch'
+      />
+      <Text style={styles.text}>Дата регистрации: {new Date(user.first_login_date).toLocaleDateString()}</Text>
+      <Text style={styles.text}>Всего входов: {user.login_count > 0 ? user.login_count : 1}</Text>
+      <View style={styles.characterContainer}>
+        <Image source={characterImages[user.character_id]} style={styles.image} />
+        <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate('ChangeCharacterScreen')}>
+          <Image source={require('../../assets/icons/iconEdit.png')} style={styles.editIcon} />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.text}>Уровень: {user.level}</Text>
+      <Text style={styles.text}>{user.experience}/{experienceThreshold}</Text>
       <View style={styles.progressBarContainer}>
         <View style={[styles.progressBar, { width: `${progress}%` }]} />
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    marginBottom: 20,
-  },
-  progressBarContainer: {
-    width: '100%',
-    height: 20,
-    backgroundColor: '#e0e0df',
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginVertical: 10,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#76c7c0',
-    borderRadius: 5,
-  },
-});
 
 export default React.memo(UserProfile);

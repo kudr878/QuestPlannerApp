@@ -75,6 +75,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
     return rejectWithValue(err);
   }
 });
+
 export const fetchUserData = createAsyncThunk('auth/fetchUserData', async (_, { getState, rejectWithValue, dispatch }) => {
   const { user, token } = getState().auth;
   try {
@@ -161,8 +162,14 @@ export const verifyCode = createAsyncThunk('auth/verifyCode', async ({ email, co
     }
     return rejectWithValue(err.response.data);
   }
+});export const checkEmail = createAsyncThunk('auth/checkEmail', async ({ email }, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/checkEmail`, { email });
+    return response.data;
+  } catch (err) {
+    return rejectWithValue(err.response.data);
+  }
 });
-
 
 
 const authSlice = createSlice({
@@ -212,6 +219,9 @@ const authSlice = createSlice({
         state.refreshToken = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(checkEmail.rejected, (state, action) => {
         state.error = action.payload;
       })
       .addCase(restoreUser.fulfilled, (state, action) => {

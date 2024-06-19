@@ -1,16 +1,14 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colorsLightTheme, maxBorder, buttonHeight, constStyles } from "./const";
-
-const screenWidth = Dimensions.get('window').width;
+import { colorsLightTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles, screenWidth, screenHeight } from "./const";
 
 export const homeScreenStyles = StyleSheet.create({
   container: {
-    ...constStyles.container,
-  },
+    flex: 1,
+    },
   contentContainer: {
     padding: '5%',
-    paddingBottom: Dimensions.get('window').height * 0.4,
-    marginTop: Dimensions.get('window').height * 0.3,
+    paddingBottom: screenHeight * 0.4,
+    marginTop: screenHeight * 0.3,
   },
   bottomContainer: {
     position: 'absolute',
@@ -50,7 +48,6 @@ export const homeScreenStyles = StyleSheet.create({
     position: 'absolute',
     width: screenWidth * 0.6,
     height: screenWidth * 0.6,
-    right: '25%',
   },
   plusButton: {
     height: buttonHeight * 1.5,
@@ -66,11 +63,34 @@ export const homeScreenStyles = StyleSheet.create({
     lineHeight: 85,
   },
   screen: {
-    width: screenWidth,
+    width: screenWidth, 
   },
   animatedContainer: {
     flexDirection: 'row',
     width: screenWidth,
+  },
+  progressBarContainer: {
+    width: Dimensions.get('window').width * .4,
+    height: 20,
+    backgroundColor: '#e0e0df',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginVertical: 10,
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: colorsLightTheme.button,
+    borderRadius: 5,
+  },
+  levelExperienceContainer: {
     position: 'absolute',
+    top: '10%',
+    left: '55%',
+    padding: 8,
+    borderRadius: 8,
+  },
+  levelExperienceText: {
+    color: '#000000',
+    fontSize: FontSizes.medium,
   },
 });

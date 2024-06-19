@@ -35,14 +35,14 @@ const Auth = ({ navigation }) => {
         <TouchableOpacity
         activeOpacity={1}
           onPress={() => handleSwitch(true)}
-          style={[styles.buttonLog, isLogin ? { backgroundColor: 'blue' } : { backgroundColor: 'gray' }]}
+          style={[styles.buttonLog, isLogin ? { backgroundColor: '#76c7c0' } : { backgroundColor: 'gray' }]}
         >
           <Text style={styles.buttonText}>Логин</Text>
         </TouchableOpacity>
         <TouchableOpacity
         activeOpacity={1}
           onPress={() => handleSwitch(false)}
-          style={[styles.buttonReg, !isLogin ? { backgroundColor: 'blue' } : { backgroundColor: 'gray' }]}
+          style={[styles.buttonReg, !isLogin ? { backgroundColor: '#76c7c0' } : { backgroundColor: 'gray' }]}
         >
           <Text style={styles.buttonText}>Регистрация</Text>
         </TouchableOpacity>

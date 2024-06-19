@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { colorsLightTheme, colorsDarkTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles, screenWidth } from "./const";
+import { colorsLightTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles, screenWidth, screenHeight } from "./const";
 
 export const authStyles = StyleSheet.create({
     container: {
@@ -11,7 +11,7 @@ export const authStyles = StyleSheet.create({
         alignSelf: 'center',
     },
     buttonLog: {
-        flex: .4,
+        flex: 0.5,
         borderTopLeftRadius: maxBorder,
         borderBottomLeftRadius: minBorder,
         paddingHorizontal: '5%',
@@ -22,7 +22,7 @@ export const authStyles = StyleSheet.create({
         backgroundColor: colorsLightTheme.button,
     },
     buttonReg: {
-        flex: .4,
+        flex: 0.5,
         borderTopRightRadius: minBorder,
         borderBottomRightRadius: maxBorder,
         paddingHorizontal: '5%',
@@ -46,7 +46,6 @@ export const authStyles = StyleSheet.create({
     button: {
         ...constStyles.button,
     },
-
     buttonText: {
         ...constStyles.buttonText
     },
@@ -60,8 +59,12 @@ export const authStyles = StyleSheet.create({
         flex: 0.5,
         marginLeft: 10,
         ...constStyles.button,
-        backgroundColor: 'blue',
-        
+    },
+    buttonTextCode: {
+        fontSize: FontSizes.medium,
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: 'bold',
     },
     disabledButton: {
         backgroundColor: 'gray',
@@ -72,19 +75,26 @@ export const authStyles = StyleSheet.create({
     },
     formSection: {
         width: '100%',
-        height: Dimensions.get('window').height,
+        height: screenHeight,
     },
     animatedWrapper: {
         position: 'absolute',
         top: '10%', 
-      },
-      animatedContainerAuth: {
+    },
+    animatedContainerAuth: {
         flexDirection: 'row',
         width: screenWidth,
         position: 'absolute',
         top: '10%',
-      },
-      screen: {
+    },
+    screen: {
         width: screenWidth
-      },    
+    },
+    errorText: {
+        marginTop:'-3.55%',
+        color: 'red',
+    },
+    errorBorder: {
+        borderColor: 'red',
+    }
 });

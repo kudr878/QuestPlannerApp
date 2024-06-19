@@ -3,6 +3,14 @@
     "version": ">= 0.48.0"
   },
   "build": {
+    "release": {
+      "env": {
+        "API_BASE_URL": "http://89.111.174.34:3000"
+      },
+     "android": {
+        "buildType": "apk"
+      }
+    },
     "development": {
       "developmentClient": false,
       "distribution": "internal"

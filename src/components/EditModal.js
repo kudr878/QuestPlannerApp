@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { Modal, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSettings } from '../../redux/settingsSlice';
 import { updateUser } from '../../redux/authSlice';
@@ -10,6 +10,7 @@ import {
   validatePassword,
   validateConfirmPassword
 } from '../utils/errorMessages';
+import { editModalStyles as styles } from '../styles/EditModalStyles';
 import { taskFormStyles } from '../styles/TaskFormStyles';
 
 const EditModal = ({ visible, onClose, field, navigation }) => {
@@ -33,7 +34,7 @@ const EditModal = ({ visible, onClose, field, navigation }) => {
       inputs: [{ name: 'email', placeholder: 'Новая электронная почта', validate: validateEmail }]
     },
     password: {
-      title: 'Изменить пароль',
+       title: 'Изменить пароль',
       inputs: [
         { name: 'oldPassword', placeholder: 'Старый пароль', secureTextEntry: true, validate: validateCurrentPassword },
         { name: 'newPassword', placeholder: 'Новый пароль', secureTextEntry: true, validate: validatePassword },
@@ -119,8 +120,12 @@ const EditModal = ({ visible, onClose, field, navigation }) => {
             </View>
           ))}
           <View style={styles.buttonContainer}>
-            <Button title="Отмена" onPress={onClose} />
-            <Button title="Сохранить" onPress={handleSave} />
+            <TouchableOpacity style={styles.button} onPress={onClose}>
+              <Text style={styles.buttonText}>Отмена</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.buttonText}>Сохранить</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -128,38 +133,5 @@ const EditModal = ({ visible, onClose, field, navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    width: '80%',
-    borderRadius: 10
-  },
-  modalTitle: {
-    fontSize: 18,
-    marginBottom: 20
-  },
-  input: {
-    height: 40,
-    marginBottom: 10,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5
-  },
-  error: {
-    color: 'red',
-    marginBottom: 5
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  }
-});
-
 export default EditModal;
+

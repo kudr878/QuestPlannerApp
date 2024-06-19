@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Alert, Animated, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, Dimensions, TouchableOpacity, BackHandler } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { registerUser, sendVerificationCode, verifyCode, checkEmail } from '../../redux/authSlice';
 import CharacterSelect from './CharacterSelect';
 import { authStyles as styles } from '../styles/AuthStyles';
-import { constStyles } from '../styles/const';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -18,6 +17,7 @@ const Register = ({ navigation }) => {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [isInitialForm, setIsInitialForm] = useState(true);
   const [timer, setTimer] = useState(0);
+  const [errors, setErrors] = useState({});
   const animation = useRef(new Animated.Value(0)).current;
 
   const dispatch = useDispatch();
@@ -32,58 +32,94 @@ const Register = ({ navigation }) => {
     return () => clearInterval(interval);
   }, [timer]);
 
+  useEffect(() => {
+    const backAction = () => true; // This disables the back button
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, []);
+
   const handleSelectCharacter = (character) => {
     setSelectedCharacter(character.id);
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSendCode = () => {
-    if (email) {
-      if (timer === 0) {
-        dispatch(checkEmail({ email }))
-          .unwrap()
-          .then(() => {
-            dispatch(sendVerificationCode({ email }))
-              .unwrap()
-              .then(() => {
-                setIsCodeSent(true);
-                setTimer(60);
-                Alert.alert('Код отправлен', 'Код подтверждения отправлен на вашу электронную почту.');
-              })
-              .catch((err) => {
-                Alert.alert('Ошибка', err.error || 'Произошла ошибка при отправке кода.');
-              });
-          })
-          .catch((err) => {
-            Alert.alert('Ошибка', err.error || 'Электронная почта уже используется.');
-          });
-      }
-    } else {
-      Alert.alert('Ошибка', 'Введите электронную почту для отправки кода.');
+    const newErrors = {};
+    if (!email) {
+      newErrors.email = 'Введите электронную почту для отправки кода';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Некорректная электронная почта';
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTimeout(() => setErrors({}), 3000);
+      return;
+    }
+
+    if (timer === 0) {
+      dispatch(checkEmail({ email }))
+        .unwrap()
+        .then(() => {
+          dispatch(sendVerificationCode({ email }))
+            .unwrap()
+            .then(() => {
+              setIsCodeSent(true);
+              setTimer(60);
+              setErrors({});
+            })
+            .catch((err) => {
+              setErrors({ general: err.error || 'Произошла ошибка при отправке кода.' });
+              setTimeout(() => setErrors({}), 3000);
+            });
+        })
+        .catch((err) => {
+          setErrors({ email: 'Электронная почта уже используется.' });
+          setTimeout(() => setErrors({}), 3000);
+        });
     }
   };
 
   const handleContinue = () => {
-    if (username && email && password && confirmPassword && verificationCode) {
-      if (password === confirmPassword) {
-        dispatch(verifyCode({ email, code: verificationCode }))
-          .unwrap()
-          .then(() => {
-            Animated.timing(animation, {
-              toValue: -screenHeight,
-              duration: 500,
-              useNativeDriver: true,
-            }).start(() => {
-              setIsInitialForm(false);
-            });
-          })
-          .catch((err) => {
-            Alert.alert('Ошибка', 'Неправильный код подтверждения.');
-          });
-      } else {
-        Alert.alert('Ошибка', 'Пароли не совпадают');
-      }
+    const newErrors = {};
+    if (!username) newErrors.username = 'Имя пользователя не может быть пустым';
+    if (!email) newErrors.email = 'Электронная почта не может быть пустой';
+    if (!password) newErrors.password = 'Пароль не может быть пустым';
+    if (!confirmPassword) newErrors.confirmPassword = 'Подтвердите пароль';
+    if (!verificationCode) newErrors.verificationCode = 'Код подтверждения не может быть пустым';
+    if (password !== confirmPassword) newErrors.confirmPassword = 'Пароли не совпадают';
+    if (!validateEmail(email)) newErrors.email = 'Некорректная электронная почта';
+    if (!validatePassword(password)) newErrors.password = 'Пароль должен содержать минимум 8 символов, включая цифру, букву и спецсимвол';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTimeout(() => setErrors({}), 5000);
     } else {
-      Alert.alert('Ошибка', 'Все поля должны быть заполнены');
+      dispatch(verifyCode({ email, code: verificationCode }))
+        .unwrap()
+        .then(() => {
+          Animated.timing(animation, {
+            toValue: -screenHeight,
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => {
+            setIsInitialForm(false);
+            setErrors({});
+          });
+        })
+        .catch((err) => {
+          setErrors({ general: 'Неправильный код подтверждения.' });
+          setTimeout(() => setErrors({}), 3000);
+        });
     }
   };
 
@@ -94,22 +130,33 @@ const Register = ({ navigation }) => {
       useNativeDriver: true,
     }).start(() => {
       setIsInitialForm(true);
+      setErrors({});
     });
   };
 
   const handleRegister = () => {
-    if (selectedCharacter) {
-      dispatch(registerUser({ username, email, password, character_id: selectedCharacter }))
-        .unwrap()
-        .then(() => {
-          navigation.navigate('Home');
-        })
-        .catch((err) => {
-          Alert.alert('Ошибка', err.error || 'Произошла ошибка при регистрации.');
-        });
-    } else {
-      Alert.alert('Ошибка', 'Выберите персонажа');
+    if (!selectedCharacter) {
+      setErrors({ character: 'Выберите персонажа' });
+      setTimeout(() => setErrors({}), 3000);
+      return;
     }
+    dispatch(checkEmail({ email }))
+      .unwrap()
+      .then(() => {
+        dispatch(registerUser({ username, email, password, character_id: selectedCharacter }))
+          .unwrap()
+          .then(() => {
+            navigation.navigate('Home');
+          })
+          .catch((err) => {
+            setErrors({ general: err.error || 'Произошла ошибка при регистрации.' });
+            setTimeout(() => setErrors({}), 3000);
+          });
+      })
+      .catch((err) => {
+        setErrors({ email: 'Электронная почта уже используется.' });
+        setTimeout(() => setErrors({}), 3000);
+      });
   };
 
   const animatedStyle = {
@@ -126,20 +173,22 @@ const Register = ({ navigation }) => {
         <View style={styles.formSection}>
           <>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.username && styles.errorBorder]}
               placeholder="Имя пользователя"
               value={username}
               onChangeText={setUsername}
             />
+            {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.email && styles.errorBorder]}
               placeholder="Электронная почта"
               value={email}
               onChangeText={setEmail}
             />
+            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
             <View style={styles.codeContainer}>
               <TextInput
-                style={[styles.input, styles.codeInput]}
+                style={[styles.input, styles.codeInput, errors.verificationCode && styles.errorBorder]}
                 placeholder="Код подтверждения"
                 value={verificationCode}
                 onChangeText={setVerificationCode}
@@ -149,25 +198,30 @@ const Register = ({ navigation }) => {
                 style={[styles.sendCodeButton, timer > 0 && styles.disabledButton]}
                 disabled={timer > 0}
               >
-                <Text style={styles.buttonText}>
+                <Text style={styles.buttonTextCode}>
                   {timer > 0 ? `Отправить код (${timer})` : 'Отправить код'}
                 </Text>
               </TouchableOpacity>
             </View>
+            {errors.verificationCode && <Text style={styles.errorText}>{errors.verificationCode}</Text>}
+
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.password && styles.errorBorder]}
               placeholder="Пароль"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
             />
+            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.confirmPassword && styles.errorBorder]}
               placeholder="Подтвердите пароль"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
             />
+            {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+            {errors.general && <Text style={styles.errorText}>{errors.general}</Text>}
             <TouchableOpacity onPress={handleContinue} style={styles.button}>
               <Text style={styles.buttonText}>Продолжить</Text>
             </TouchableOpacity>
@@ -176,12 +230,14 @@ const Register = ({ navigation }) => {
         <View style={styles.formSection}>
           <>
             <CharacterSelect onSelect={(character) => handleSelectCharacter(character)} characterId={selectedCharacter} />
+            {errors.character && <Text style={styles.errorText}>{errors.character}</Text>}
             <TouchableOpacity onPress={handleBack} style={styles.button}>
               <Text style={styles.buttonText}>Назад</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleRegister} style={styles.button}>
               <Text style={styles.buttonText}>Зарегистрироваться</Text>
             </TouchableOpacity>
+            {errors.general && <Text style={styles.errorText}>{errors.general}</Text>}
           </>
         </View>
       </Animated.View>

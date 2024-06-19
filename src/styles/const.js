@@ -4,22 +4,22 @@ export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
 
 export const FontSizes = {
-    small: Dimensions.get('window').width*0.03,
-    medium: Dimensions.get('window').width*0.038,
-    large: Dimensions.get('window').width*0.05,
-    xlarge: Dimensions.get('window').width*0.06,
+    small: screenWidth * 0.03,
+    medium: screenWidth * 0.038,
+    large: screenWidth * 0.05,
+    xlarge: screenWidth * 0.06,
 }
 
-export const buttonHeight = Dimensions.get('window').height*0.065;
+export const buttonHeight = screenHeight * 0.065;
 
 export const minBorder = 2;
 export const maxBorder = 40;
 
 export const colorsLightTheme = {
-   buttonText : '#fff',
-   button : '#76c7c0',
-   labelText : '#000',
-   inputBorder : '#76c7c0',
+    buttonText: '#fff',
+    button: '#76c7c0',
+    labelText: '#000',
+    inputBorder: '#76c7c0',
 }
 
 export const constStyles = StyleSheet.create({
@@ -38,19 +38,19 @@ export const constStyles = StyleSheet.create({
         borderBottomRightRadius: maxBorder,
         borderTopLeftRadius: maxBorder,
         borderBottomLeftRadius: minBorder,
-        paddingHorizontal: '5%',
         marginBottom: '5%', 
         height: buttonHeight,
         justifyContent: 'center',
         alignItems: 'center',   
         backgroundColor: colorsLightTheme.button,
     },
-    buttonText : {
-        fontSize: FontSizes.medium,
+    buttonText: {
+        fontSize: FontSizes.large,
         color: colorsLightTheme.buttonText,
         textAlign: 'center',
+        fontWeight: 'bold',
     },
-    input : {
+    input: {
         borderTopRightRadius: minBorder,
         borderBottomRightRadius: maxBorder,
         borderTopLeftRadius: maxBorder,
@@ -61,16 +61,15 @@ export const constStyles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',    
         backgroundColor: '#ffffff90',
-        borderWidth: .5,
+        borderWidth: 0.5,
         borderColor: colorsLightTheme.inputBorder,
         fontSize: FontSizes.medium,
     },
     background: {
         position: 'absolute',
         top: 0,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+        width: screenWidth,
+        height: screenHeight,
         alignSelf: 'center',
     },
-
 });

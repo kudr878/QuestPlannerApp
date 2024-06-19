@@ -1,5 +1,6 @@
-import { StyleSheet, Dimensions } from "react-native";
-import { colorsLightTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles } from "./const";
+// TaskFormStyles.js
+import { Dimensions, StyleSheet } from "react-native";
+import { colorsLightTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles, screenWidth, screenHeight } from "./const";
 
 export const taskFormStyles = StyleSheet.create({
   scrollContainer: {
@@ -12,38 +13,10 @@ export const taskFormStyles = StyleSheet.create({
     ...constStyles.input,
   },
   multilineInput: {
-    borderTopRightRadius: minBorder,
-    borderBottomRightRadius: maxBorder,
-    borderTopLeftRadius: maxBorder,
-    borderBottomLeftRadius: minBorder,
-    paddingHorizontal: '5%',
+    ...constStyles.input,
     paddingVertical: '2%',
-    marginBottom: '5%', 
-    minHeight: buttonHeight, 
-    justifyContent: 'center',
-    alignItems: 'center',    
-    backgroundColor: '#ffffff90',
-    borderWidth: .5,
-    borderColor: colorsLightTheme.inputBorder,
-    fontSize: FontSizes.medium,
-  },
-  multilineInputSub: {
-    borderTopRightRadius: minBorder,
-    borderBottomRightRadius: maxBorder,
-    borderTopLeftRadius: maxBorder,
-    borderBottomLeftRadius: minBorder,
-    paddingHorizontal: '5%',
     paddingRight: '7.5%',
-    paddingVertical: '2%',
-    marginBottom: '5%', 
-    minHeight: buttonHeight, 
-    justifyContent: 'center',
-    alignItems: 'center',    
-    backgroundColor: '#ffffff90',
-    borderWidth: .5,
-    borderColor: colorsLightTheme.inputBorder,
-    fontSize: FontSizes.medium,
-  },  
+  },
   errorBorder: {
     borderColor: 'red',
   },
@@ -55,20 +28,17 @@ export const taskFormStyles = StyleSheet.create({
   dateContainer: {
     flex: 1,
   },
-  dateText: {
-    fontSize: 16,
-  },
   datePickerButton: {
     marginHorizontal: 5,
   },
   datePickerButtonText: {
-    fontSize: 24,
+    fontSize: FontSizes.xlarge,
   },
   repeatIntervalContainer: {
     marginVertical: 8,
   },
   label: {
-    fontSize: 16,
+    fontSize: FontSizes.medium,
   },
   intervalControls: {
     flexDirection: 'row',
@@ -80,9 +50,7 @@ export const taskFormStyles = StyleSheet.create({
   },
   daysOfWeekContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginVertical: 8,
-  },
+ },
   dayButton: {
     padding: 8,
     margin: 2,
@@ -95,22 +63,61 @@ export const taskFormStyles = StyleSheet.create({
     borderColor: '#007bff',
   },
   dayButtonText: {
-    fontSize: 16,
+    fontSize: FontSizes.medium,
   },
   subtaskTitle: {
-    marginTop: 16,
-    fontSize: 18,
+    marginVertical: '5%',
+    fontSize: FontSizes.medium,
     fontWeight: 'bold',
   },
   subtaskContainer: {
   },
   deleteButton: {
     position: 'absolute',
-    top:'2.5%',
-    right:'2.5%',
+    top: '2.5%',
+    right: '2.5%',
   },
   deleteButtonText: {
-    padding: 8,
+    fontSize: Dimensions.get('window').width * 0.05,
     color: 'red',
   },
+  saveButton: {
+...constStyles.button,
+    position: 'static',
+    alignSelf: 'center',
+    bottom: 0,
+    width: '80%',
+  },
+  saveButtonText: {
+    ...constStyles.buttonText,
+  },
+  addSubtaskButton : {
+    position: 'absolute', 
+    right: '3%',
+  },
+  addSubtaskButtonText : {
+    fontSize: Dimensions.get('window').width * 0.1,
+    top: '-15%',
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  picker: {
+    height: buttonHeight,
+  },
+  pickerText: {
+    fontSize: FontSizes.medium,
+  },
+  intervalButton: {
+    ...constStyles.button,
+    width: '10%',
+  },
+  intervalButtonText: {
+    ...constStyles.buttonText,
+  },
+  intervalText  : {
+    fontSize: FontSizes.large,    
+    paddingBottom: '5%',
+    paddingHorizontal: '3%',
+  },
+
 });

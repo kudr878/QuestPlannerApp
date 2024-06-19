@@ -41,7 +41,7 @@ const EditTask = () => {
 
   return (
     <View>
-                        <Image 
+        <Image 
           source={require('../../assets/backgrounds/background.png')}
           style={{
               position: 'absolute',

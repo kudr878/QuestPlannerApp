@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import EditModal from '../components/EditModal';
-import { logoutUser,clearUser } from '../../redux/authSlice';
+import { logoutUser, clearUser } from '../../redux/authSlice';
+import { settingsStyles as styles } from '../styles/SettingsStyles';
 
 const SettingsScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -15,7 +16,7 @@ const SettingsScreen = ({ navigation }) => {
         .unwrap()
         .then(() => {
           dispatch(clearUser());
-          navigation.replace('Settings');
+          navigation.replace('Auth');
         })
         .catch((error) => {
           alert('Ошибка при выходе из системы: ' + error.message);
@@ -29,32 +30,26 @@ const SettingsScreen = ({ navigation }) => {
   
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Настройки пользователя</Text>
-        <Button title="Изменить имя пользователя" onPress={() => openModal('username')} />
-        <Button title="Изменить электронную почту" onPress={() => openModal('email')} />
-        <Button title="Изменить пароль" onPress={() => openModal('password')} />
+        <TouchableOpacity style={styles.button} onPress={() => openModal('username')}>
+          <Text style={styles.buttonText}>Изменить имя пользователя</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => openModal('email')}>
+          <Text style={styles.buttonText}>Изменить электронную почту</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => openModal('password')}>
+          <Text style={styles.buttonText}>Изменить пароль</Text>
+        </TouchableOpacity>
         <EditModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
           field={currentField}    
           navigation={navigation}
         />
-        <Button title="Выйти" onPress={handleLogout} />
-
+        <TouchableOpacity style={styles.button} onPress={handleLogout}>
+          <Text style={styles.buttonText}>Выйти</Text>
+        </TouchableOpacity>
       </View>
     );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    marginBottom: 20,
-  }
-});
 
 export default SettingsScreen;
