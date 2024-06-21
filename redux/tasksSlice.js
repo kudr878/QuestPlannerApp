@@ -85,7 +85,7 @@ const getTaskRepeatInfo = (task) => {
     const date = new Date(datetime);
     const options = {
       year: 'numeric', month: 'numeric', day: 'numeric',
-      hour: 'numeric', minute: 'numeric'
+      hour: 'numeric', minute: 'numeric',
     };
     return date.toLocaleDateString('ru-RU', options);
   };
@@ -93,7 +93,7 @@ const getTaskRepeatInfo = (task) => {
   const formatDateWithoutYear = (datetime) => {
     const date = new Date(datetime);
     const options = {
-      month: 'long', day: 'numeric'
+      month: 'long', day: 'numeric',
     };
     return date.toLocaleDateString('ru-RU', options);
   };
@@ -101,7 +101,7 @@ const getTaskRepeatInfo = (task) => {
   const formatTime = (datetime) => {
     const date = new Date(datetime);
     const options = {
-      hour: 'numeric', minute: 'numeric'
+      hour: 'numeric', minute: 'numeric',
     };
     return date.toLocaleTimeString('ru-RU', options);
   };

@@ -24,26 +24,34 @@ const Home = ({ navigation, route }) => {
   const scrollViewRef2 = useRef(null);
 
   useEffect(() => {
-    if (user && user.id) {
-      dispatch(fetchUserData());
-      dispatch(fetchTasks(user.id));
-    } else {
+    if (!user) {
       navigation.replace('Auth');
+      return; 
     }
+    dispatch(fetchUserData());
+    dispatch(fetchTasks(user.id));
   }, [user, dispatch, navigation]);
+  
+
+  useEffect(() => {
+    if (!user) return; 
+
+    const experienceThreshold = calculateExperienceThreshold(user.level);
+    const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
+    const updatedProgress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
+    setProgress(updatedProgress);
+  }, [user]);
+
 
   useEffect(() => {
     if (route.params && route.params.initialTab) {
       handleTabChange(route.params.initialTab);
     }
   }, [route.params]);
-  useEffect(() => {
-    const experienceThreshold = calculateExperienceThreshold(user.level);
-    const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;
-    const progress = ((user.experience - previousLevelThreshold) / (experienceThreshold - previousLevelThreshold)) * 100;
-  
-    setProgress(progress);
-  }, [user.experience, user.level]);
+
+  if (!user) {
+    return null;
+  }
 
   const handleTabChange = (newTab) => {
     resetScrollPosition(newTab);
@@ -83,10 +91,6 @@ const Home = ({ navigation, route }) => {
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
-
-  if (!user) {
-    return null;
-  }
 
   const experienceThreshold = calculateExperienceThreshold(user.level);
   const previousLevelThreshold = user.level > 1 ? calculateExperienceThreshold(user.level - 1) : 0;

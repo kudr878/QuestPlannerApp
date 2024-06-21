@@ -94,7 +94,7 @@ const Register = ({ navigation }) => {
     if (!verificationCode) newErrors.verificationCode = 'Код подтверждения не может быть пустым';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Пароли не совпадают';
     if (!validateEmail(email)) newErrors.email = 'Некорректная электронная почта';
-    if (!validatePassword(password)) newErrors.password = 'Пароль должен содержать минимум 8 символов, включая цифру, букву и спецсимвол';
+    if (!validatePassword(password)) newErrors.password = 'Пароль должен содержать минимум 8 символов, включая цифру, букву и спецсимвол(@$!%*?&)';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

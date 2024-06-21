@@ -61,7 +61,7 @@ export const authStyles = StyleSheet.create({
         ...constStyles.button,
     },
     buttonTextCode: {
-        fontSize: FontSizes.medium,
+        fontSize: FontSizes.medium*0.8,
         color: 'white',
         textAlign: 'center',
         fontWeight: 'bold',
@@ -88,7 +88,8 @@ export const authStyles = StyleSheet.create({
         top: '10%',
     },
     screen: {
-        width: screenWidth
+        width: screenWidth,
+        backgroundColor: '#ffffff86',
     },
     errorText: {
         marginTop:'-3.55%',

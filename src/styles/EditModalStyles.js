@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { colorsLightTheme, minBorder, maxBorder, FontSizes, buttonHeight, constStyles, screenWidth, screenHeight } from "./const";
 
 export const editModalStyles = StyleSheet.create({
@@ -28,10 +28,7 @@ export const editModalStyles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: Dimensions.get('window').width * .95,
   },
   button: {
     backgroundColor: colorsLightTheme.button,

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Animated } from 'react-native';
+import { View, TouchableOpacity, Text, Animated, Image, Dimensions } from 'react-native';
 import Login from '../components/Login';
 import Register from '../components/Register';
 import { authStyles as styles } from '../styles/AuthStyles';
@@ -31,6 +31,17 @@ const Auth = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image 
+              source={require('../../assets/backgrounds/background1.png')}
+              style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: Dimensions.get('window').width,
+                  height: Dimensions.get('window').height,
+                  alignSelf: 'center',
+              }}
+              resizeMode='stretch'
+            />
     <View style={styles.switchContainer}>
         <TouchableOpacity
         activeOpacity={1}
